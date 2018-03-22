@@ -1,0 +1,10 @@
+*~
+output/
+tmp/
+.DS_Store
+cpp-programming-styl.synctex
+cpp-programming-style.aux
+cpp-programming-style.log
+cpp-programming-style.out
+cpp-programming-style.toc
+test.txt

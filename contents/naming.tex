@@ -1,0 +1,474 @@
+\begin{savequote}[45mm]
+\ascii{Write programs for people first, computers second.}
+\qauthor{\ascii{- Steve McConnell}}
+\end{savequote}
+
+\chapter{命名} 
+\label{ch:naming}
+
+\begin{content}
+
+良好的命名将改善代码的表现力，与其说命名是一门技术，不如说它是一门艺术。必须坚持、并慎重地给程序中的每一个实体取好名字，让其名副其实，代码的可读性将得到极大的改善。
+
+\end{content}
+
+\section{Baby Names}
+\begin{content}
+
+\begin{regulation}
+遵守统一的命名规范
+\end{regulation}
+
+一些程序设计语言，从诞生的时刻就有着自己的文化背景，整个社区有着统一的命名规则。但\cpp{}在社区中存在众多的命名风格，有的与时俱进，也非常人性化；有的则已经与现代软件工程格格不入\footnote{例如社区中依然存在一批忠实的匈牙利的守护者，他们认为一个名称没有前缀和后缀标识它们的类型，他们几乎都看不懂代码了。}。
+
+下文罗列了一些\cpp{}典型的命名规范供参考。每一种命名规范都有自身自己的优缺点，团队应该根据自身的实际情况选择适合自己的命名规范。最重要的是，团队应遵循统一的命名规范，不应该出现两种或两种以上的命名风格。
+
+我们推荐团队使用下文中任意一种命名风格，但如果由于历史遗留原因导致革新非常困难，而无法采用新的命名规范，团队依然要保持统一的命名规范，避免出现多种命名风格。
+
+\begin{table}[!htb]
+\resizebox{0.95\textwidth}{!} {
+\begin{tabular*}{1.2\textwidth}{@{}ll@{}}
+\toprule
+\ascii{Identifier} & \ascii{Examples} \\
+\midrule
+\ascii{Namespace}  & \ascii{std, dcm, mockcpp, testing} \\
+\ascii{Class/Struct/Union} & \ascii{Timer, FutureTask, LinkedHashMap, HttpServlet} \\ 
+\ascii{Method} & \ascii{remove, ensureCapacity, getCrc} \\
+\ascii{Constant/Macro/Enum} & \ascii{IDLE, ACTIVE, MAX\_LINK\_NUM} \\
+\ascii{Local Variable} & \ascii{i, xref, houseNumber} \\
+\ascii{Type Parameter} & \ascii{T, E, K, V, X, T1, T2} \\
+\bottomrule
+\end{tabular*}
+}
+\caption{驼峰命名规范1}
+\label{tbl:naming-1}
+\end{table}
+
+还有一种命名风格与上一种风格类同，只是成员函数/函数都以大写开头的驼峰命名。
+
+\begin{table}[!htb]
+\resizebox{0.95\textwidth}{!} {
+\begin{tabular*}{1.2\textwidth}{@{}ll@{}}
+\toprule
+\ascii{Identifier} & \ascii{Examples} \\
+\midrule
+\ascii{Namespace}  & \ascii{std, dcm, mockcpp, testing} \\
+\ascii{Class/Struct/Union} & \ascii{Timer, FutureTask, LinkedHashMap, HttpServlet} \\ 
+\ascii{Method} & \ascii{Remove, EnsureCapacity, GetCrc} \\
+\ascii{Constant/Macro/Enum} & \ascii{IDLE, ACTIVE, MAX\_LINK\_NUM} \\
+\ascii{Local Variable} & \ascii{i, xref, houseNumber} \\
+\ascii{Type Parameter} & \ascii{T, E, K, V, X, T1, T2} \\
+\bottomrule
+\end{tabular*}
+}
+\caption{驼峰命名规范2}
+\label{tbl:naming-2}
+\end{table}
+
+
+第三种命名风格，主要体现在标准库或\ascii{Boost}准标准库社区，其规则非常简单，下划线分割的全小写，或下划线分割的全大写。
+
+\begin{table}[!htb]
+\resizebox{0.95\textwidth}{!} {
+\begin{tabular*}{1.2\textwidth}{@{}ll@{}}
+\toprule
+\ascii{Identifier} & \ascii{Examples} \\
+\midrule
+\ascii{Namespace}  & \ascii{boost, details, mpl} \\
+\ascii{Class/Struct/Union} & \ascii{any, is\_enum, shared\_ptr} \\ 
+\ascii{Method} & \ascii{any\_cast, type\_of} \\
+\ascii{Constant/Macro/Enum} & \ascii{IDLE, ACTIVE, MAX\_LINK\_NUM} \\
+\ascii{Local Variable} & \ascii{i, xref, house\_number} \\
+\ascii{Type Parameter} & \ascii{T, E, K, V, X, T1, T2} \\
+\bottomrule
+\end{tabular*}
+}
+\caption{标准库或\ascii{boost}命名规范}
+\label{tbl:naming-3}
+\end{table}
+
+\begin{regulation}
+绝不使用汉语拼音命名
+\end{regulation}
+
+必须实用标准的英语命名程序实体，不允许实用汉语拼音。
+
+\begin{regulation}
+类名应该是名词或名词短语；接口可以是形容词; 方法名应该是动词或动词短语
+\end{regulation}
+
+\begin{table}[!htb]
+\resizebox{0.95\textwidth}{!} {
+\begin{tabular*}{1.2\textwidth}{@{}ll@{}}
+\toprule
+\ascii{类别} & \ascii{举例} \\
+\midrule
+\ascii{正确的类名}  & \ascii{AddressParser, EventRegistry} \\
+\ascii{错误的类名} & \ascii{ParseAddress, RegisterEvent} \\
+\bottomrule
+\end{tabular*}
+}
+\caption{类名}
+\label{tbl:naming-4}
+\end{table}
+
+接口可以是形容词，最为常见的就是定义能力接口，即以\ascii{-able}结尾。
+
+反例：
+\begin{leftbar}
+\begin{c++}[caption={\ttfamily{cub/thread/Runnable.h}}]
+#ifndef LJKYIUERUIQ09857983_NVHKJKHA86100494_JGYQPIPWNC
+#define LJKYIUERUIQ09857983_NVHKJKHA86100494_JGYQPIPWNC
+
+#include <cub/base/Keywords.h>
+
+// 接口必须是形容词或名词，不允许是动词
+DEFINE_ROLE(Run)
+{
+    ABSTRACT(void run());
+};
+
+#endif
+\end{c++}
+\end{leftbar}
+
+正例：
+\begin{leftbar}
+\begin{c++}[caption={\ttfamily{cub/thread/Runnable.h}}]
+#ifndef LJKYIUERUIQ09857983_NVHKJKHA86100494_JGYQPIPWNC
+#define LJKYIUERUIQ09857983_NVHKJKHA86100494_JGYQPIPWNC
+
+#include <cub/base/Keywords.h>
+
+DEFINE_ROLE(Runnable)
+{
+    ABSTRACT(void run());
+};
+
+#endif
+\end{c++}
+\end{leftbar}
+
+\begin{regulation}
+如果函数返回值为\ascii{bool}，加上\ascii{is, has, can, should, need}将会增强语意
+\end{regulation}
+
+反例：
+\begin{leftbar}
+\begin{c++}
+bool readPassword = true;
+\end{c++}
+\end{leftbar}
+
+至少存在两种解释，
+
+\begin{enum}
+  \eitem{\ascii{We need to read the password}}
+  \eitem{\ascii{The password has already been read}}
+\end{enum}
+
+正例：
+\begin{leftbar}
+\begin{c++} 
+bool needPassword = true;
+bool userIsAuthenticated = true; 
+\end{c++}
+\end{leftbar}
+
+\begin{regulation}
+丰富你的单词库，在面对具体问题时你具有更多的\ascii{Colorfull Words}
+\end{regulation}
+
+如\reftbl{colorful-words}所示，同一概念是有很多种表达方式的。
+
+\begin{table}[!htb]
+\resizebox{0.95\textwidth}{!} {
+\begin{tabular*}{1.2\textwidth}{@{}ll@{}}
+\toprule
+\ascii{Word} & \ascii{Alternatives} \\
+\midrule
+\ascii{send}  & \ascii{deliver, dispatch, announce, distribute, route} \\
+\ascii{find} & \ascii{dsearch, extract, locate, recover} \\ 
+\ascii{start} & \ascii{launch, create, begin, open} \\
+\ascii{make} & \ascii{create, set up, build, generate, compose, add, new} \\
+\bottomrule
+\end{tabular*}
+}
+\caption{丰富的词汇}
+\label{tbl:colorful-words}
+\end{table}
+
+\begin{regulation}
+名字在明确意图的前提下越短越好
+\end{regulation}
+
+反例：
+\begin{leftbar}
+\begin{c++}
+ControllerForEfficientHandlingOfStrings
+ControllerForEfficientStorageOfStrings
+\end{c++}
+\end{leftbar}
+
+因为这两个类名实在是太相似了，一时间很难区分。当别人打算复用你的代码时，必然承受着巨大的记忆包袱。
+
+另外，实体名称的长度应该于作用域的大小成正比。如果是一个实体暴露在全局命名空间，则需要适当增加名字长度，防止名字冲突\footnote{应该使用命名空间，避免增加模块前缀信息。}。相反地，在一个很小的函数之内可见的局部变量，尤其在一个短小的\ascii{for}循环作用域内，完全没有必要取一个很长的名字。
+
+反例：
+\begin{leftbar}
+\begin{c++}[caption={\ttfamily{cub/trans-dsl/listener/MutilEventListener.cpp}}]
+void MutilEventListener::onEventDone()
+{
+    for(int index=0; index!=listeners.size(); index++)
+    {
+        listeners[index].onEventDone();
+    }
+}
+\end{c++}
+\end{leftbar}
+
+优秀的程序员在命名的长短的取舍总是游刃有余，但从来没有降低过代码的意图。
+
+正例：
+\begin{leftbar}
+\begin{c++}[caption={\ttfamily{cub/trans-dsl/listener/MutilEventListener.cpp}}]
+void MutilEventListener::onEventDone()
+{
+    for(int i=0; i!=listeners.size(); i++)
+    {
+        listeners[i].onEventDone();
+    }
+}
+\end{c++}
+\end{leftbar}
+
+使用\ascii{C++11}的\ascii{for-each}特性，可进一步改善设计。
+
+正例：
+\begin{leftbar}
+\begin{c++}[caption={\ttfamily{cub/trans-dsl/listener/MutilEventListener.cpp}}]
+void MutilEventListener::onEventDone()
+{
+    for(auto& listener : listeners)
+    {
+        listeners.onEventDone();
+    }
+}
+\end{c++}
+\end{leftbar}
+
+
+\begin{regulation}
+程序中每个实体都应该有一个意图明确\ascii{(Intention-Revealing)}的名称
+\end{regulation}
+
+反例：
+\begin{leftbar}
+\begin{c++}[caption={\ttfamily{game/chess/GameBoard.h}}]
+vector<vector<int> > getThem() 
+{
+    vector<vector<int> > list1;
+    
+    for(auto x : theList)
+    {
+        if(x[0] == 4)
+        {   
+            list1.add(x);
+        }
+    }
+    
+    return list1;
+}
+\end{c++}
+\end{leftbar}
+
+\begin{enum}
+  \eitem{\ascii{vector<vector<int> >}的语法令人抓狂}
+  \eitem{\ascii{getThem}让人看不清楚它的本意}
+  \eitem{\ascii{theList}到底是什么东西？}
+  \eitem{\ascii{0}下标意味着什么？\ascii{4}又意味着什么？}
+  \eitem{\ascii{list1}就是为了编译通过吗？}
+\end{enum}
+
+换一个好名字之后，并对数据结构的实现细节进行了简单的封装，便可以得到一个更合理的设计。
+
+正例：
+\begin{leftbar}
+\begin{c++}[caption={\ttfamily{game/chess/Cell.h}}]
+#ifndef UTJKLFJS_467867_NBHD83562_HETRIO_75649
+#define UTJKLFJS_467867_NBHD83562_HETRIO_75649
+
+#include <vector>
+
+struct Cell
+{
+    bool isFlagged() const;
+
+private:
+    std::vector<int> states;
+};
+
+using Cells = std::vector<Cell>;
+
+#endif
+\end{c++}
+\end{leftbar}
+
+\begin{leftbar}
+\begin{c++}[caption={\ttfamily{game/chess/GameBoard.h}}]
+#ifndef JAAA_1295_BBVBAA_GFYQQPPAAMZZ0092444_N
+#define JAAA_1295_BBVBAA_GFYQQPPAAMZZ0092444_N
+
+#include <game/chess/Cell.h>
+
+struct GameBoard
+{
+    void collectFlaggedCells(Cells&) const;
+
+private:
+    Cells board;
+};
+
+#endif
+\end{c++}
+\end{leftbar}
+
+\begin{leftbar}
+\begin{c++}[caption={\ttfamily{game/chess/GameBoard.cpp}}]
+void GameBoard::collectFlaggedCells(Cells& cells) const
+{
+    for(auto &cell : board)
+    {
+        if(cell->isFlagged())
+        {
+            cells.push_back(cell);
+        }
+    }
+}  
+\end{c++}
+\end{leftbar}
+\end{c++}
+\end{leftbar}
+
+\begin{regulation}
+避免在名称中携带数据结构的信息
+\end{regulation}
+
+\begin{content}
+
+别用\ascii{accountList，accountArray}指定一组账号，当包含\ascii{Account}的容器不在是一个\ascii{List}或\ascii{Array}的时候，就会引发错误的判断。所以，用\ascii{accountGroup}，\ascii{bunchOfAccounts}，甚至直接使用\ascii{accounts}，情况都会更好一些。
+
+\end{content}
+
+\begin{regulation}
+\ascii{Noise Words are Redundant}，消除噪声后将得到一个更加精准的名字
+\end{regulation}
+
+\begin{table}[!htb]
+\resizebox{0.95\textwidth}{!} {
+\begin{tabular*}{1.2\textwidth}{@{}ll@{}}
+\toprule
+\ascii{Short Name} & \ascii{Redundant Names} \\
+\midrule
+\ascii{Name}  & \ascii{StrName, NameString} \\
+\ascii{Customer} & \ascii{CustmerObject, CustmerInfo} \\ 
+\ascii{accouts} & \ascii{accountList, accountArray} \\
+\ascii{accout} & \ascii{accountData, accountInfo} \\  
+\ascii{money} & \ascii{moneyAmount} \\
+\ascii{message} & \ascii{theMessage} \\
+\bottomrule
+\end{tabular*}
+}
+\caption{消除冗余的噪声}
+\label{tbl:redundant-words}
+\end{table}
+
+\begin{regulation}
+使用\ascii{Domain}领域内的名称，将更直白地表明你的设计，增强领域内成员的沟通
+\end{regulation}
+
+\begin{enum}
+  \eitem{\ascii{Factory, Visitor, Repository}}
+  \eitem{\ascii{valueOf, of, getInstance, newInstance, newType}}
+  \eitem{\ascii{AppendAble, Closeable, Runnable, Readable, Invokable}}
+\end{enum}
+
+\begin{content}
+
+当使用\ascii{Visitor}，你在使用访问者模式；当使用\ascii{valueOf,
+of}，你在使用静态工厂方法。领域内的命名风格，让领域内的成员更加快捷地理解你的设计意图。
+
+\end{content}
+
+\end{content}
+
+\section{匈牙利命名}
+\begin{content}
+
+\begin{advise}
+摒弃匈牙利命名
+\end{advise}
+
+匈牙利命名曾风靡一时。但是，现代编程语言具有更丰富的类型系统；人们更趋于使用更小的类，更短的函数，让每一个变量定义都在可控的视野范围之内；此外，\ascii{IDE}变得越来智能和强大，匈牙利命名反而变成了一种噪声和肉刺。
+
+\begin{advise}
+摒弃给成员变量加前缀，或后缀。
+\end{advise}
+
+为类的成员变量增加\ascii{m\_}前缀同样没有必要。与其纠结加前缀还是不加前缀，不如花费更多的时间将类分解；当类足够小，职责足够单一，加之现代\ascii{IDE}的着色功能，成员变量和普通变量一眼便能识别开来\footnote{\ascii{Eclipse}默认使用蓝色与普通变量区别开来，其他\ascii{IDE}也提供类似的功能。}。
+
+\begin{advise}
+摒弃常量的前缀。
+\end{advise}
+
+常量前增加\ascii{k\_}前缀同样没有必要，如果熟悉了大写、下划线隔开的命名风格，\ascii{k\_}前缀完全属于多余。
+
+\begin{advise}
+摒弃接口和类的前缀
+\end{advise}
+
+在接口前增加\ascii{I\_}，在类前增加\ascii{C\_}，同样完全没有必要，它只能对重构带来阻力，百害而无一利。
+
+反例：
+\begin{leftbar}
+\begin{c++}[caption={\ttfamily{trans-dsl/sched/IAction.h}}]
+#ifndef NVCHKJSD903085_JGOIUUE906894_VBKSJKJA075774
+#define NVCHKJSD903085_JGOIUUE906894_VBKSJKJA075774    
+
+#include <cub/base/Keywords.h>
+#include <cub/base/Status.h>
+
+struct TransactionInfo;
+
+DEFINE_ROLE(IAction)
+{
+    ABSTRACT(Status exec(const TransactionInfo&));
+};
+
+#endif
+\end{c++}
+\end{leftbar}
+
+正例：
+\begin{leftbar}
+\begin{c++}[caption={\ttfamily{trans-dsl/sched/IAction.h}}]
+#ifndef NVCHKJSD903085_JGOIUUE906894_VBKSJKJA075774
+#define NVCHKJSD903085_JGOIUUE906894_VBKSJKJA075774    
+
+#include <cub/base/Keywords.h>
+#include <cub/base/Status.h>
+
+struct TransactionInfo;
+
+DEFINE_ROLE(Action)
+{
+    ABSTRACT(Status exec(const TransactionInfo&));
+};
+
+#endif
+\end{c++}
+\end{leftbar}
+
+如果非得在接口与实现中选择，宁愿选择实现中增加\ascii{Impl}后缀。
+
+\end{content}

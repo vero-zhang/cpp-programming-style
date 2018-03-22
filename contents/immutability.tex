@@ -1,0 +1,246 @@
+\begin{savequote}[45mm]
+\ascii{Controlling complexity is the essence of computer programming.}
+\qauthor{\ascii{- Brian Kernighan}}
+\end{savequote}
+
+\chapter{不可变性}
+\label{ch:immutability}
+
+\section{const}
+
+\begin{content}
+
+\begin{regulation}
+使用\ascii{const}，或者枚举常量替代\ascii{\#define}的宏常量。
+\end{regulation}
+
+这样做可以及大地提高编译时类型的安全性。
+
+\begin{regulation}
+当类的成员函数具有查询语义时，应将其声明为\ascii{const}成员函数。
+\end{regulation}
+
+此处具有查询语义的函数，泛指所有对对象状态未产生副作用。\ascii{const}成员函数往往都以\ascii{get, is, has,
+should}开头。
+
+反例：
+\begin{leftbar}
+\begin{c++}[caption={cub/math/Rectangle.h}]
+#ifndef EWRIUN9037_NVHD6452_JKLSDFUIE7562_HGYE
+#define EWRIUN9037_NVHD6452_JKLSDFUIE7562_HGYE
+
+#include <cub/base/BaseTypes.h>
+
+struct Rectangle
+{
+    Rectangle(U8 width, U8 height);
+
+    U16 calcArea();
+
+private:
+    U8 width;
+    U8 height;
+};
+
+#endif
+\end{c++}
+\end{leftbar}
+
+此例中未对那些具有查询语义的函数声明为\ascii{const}。\ascii{const}的存在不仅仅是为了提高编译时的安全性检查，更重要的是\ascii{const}建立了用户和类之间的契约关系，并传达了程序员良好设计的心声。
+
+当对象以\ascii{pass-by-const-reference}传递时，用户只能调用其\ascii{const}成员函数；此外，\ascii{const}建立的契约，使\ascii{Replace Temp with Query}的重构手法成为可能。
+
+正例：
+\begin{leftbar}
+\begin{c++}[caption={math/Rectangle.h}]
+#ifndef EWRIUN9037_NVHD6452_JKLSDFUIE7562_HGYE
+#define EWRIUN9037_NVHD6452_JKLSDFUIE7562_HGYE
+
+#include <cub/base/BaseTypes.h>
+
+struct Rectangle
+{
+    Rectangle(U8 width, U8 height);
+
+    U16 calcArea() const;
+
+private:
+    U8 width;
+    U8 height;
+};
+
+#endif
+\end{c++}
+\end{leftbar}
+
+\begin{advise}
+\ascii{const}成员函数不应该修改系统的状态
+\end{advise}
+
+编译器只能保证\ascii{const}成员函数修改成员变量时提示错误，而未对修改全局变量，类的静态变量，或者其他的形式的副作用等情况进行检查，应杜绝此类情况的发生。
+
+\begin{regulation}
+以\ascii{pass-by-reference-to-const}替代\ascii{pass-by-value}传递对象，以改善性能，并避免切割问题
+\end{regulation}
+
+虽然我们不提倡进行过早的优化，但也绝不提倡不成熟的劣化。\ascii{pass-by-reference-to-const}就是此句名言最好的一个例子。
+
+\begin{advise}
+当传递内置类型，迭代器及函数对象时，应该\ascii{pass-by-value}。如果使用\ascii{const}修饰，往往可以改善\ascii{API}的可读性。
+\end{advise}
+
+其中，\ascii{Status, ActionId}分别是\ascii{U32, U16}的\ascii{typedef}，但在设计\ascii{onDone}原型时，\ascii{const}的修饰不仅仅为了改善其安全性，更重要的是与\ascii{TransactionInfo}的\ascii{reference-to-const}形成对称性\footnote{关于对称性，请参考\ascii{Kent
+Beck}的著作\ascii{《实现模式》}}，改善了\ascii{API}的美感。
+
+反例：
+\begin{leftbar}
+\begin{c++}[caption={trans-dsl/listener/TransactionListener.h}]
+#ifndef UTJKLFJS_467867_NBHD83562_HETRIO_75649
+#define UTJKLFJS_467867_NBHD83562_HETRIO_75649
+
+#include <cub/base/Status.h>
+#include <cub/trans-dsl/concept/ActionId.h>
+
+struct TransactionInfo;
+
+DEFINE_ROLE(TransactionListener)
+{   
+    DEFAULT(Status, onStarting(const TransactionInfo&, const ActionId&));
+    DEFAULT(Status, onDone(const TransactionInfo&, const ActionId&, const Status&));
+};
+
+#endif
+\end{c++}
+\end{leftbar}
+
+正例：
+\begin{leftbar}
+\begin{c++}[caption={trans-dsl/listener/TransactionListener.h}]
+#ifndef UTJKLFJS_467867_NBHD83562_HETRIO_75649
+#define UTJKLFJS_467867_NBHD83562_HETRIO_75649
+
+#include <cub/base/Status.h>
+#include <cub/trans-dsl/concept/ActionId.h>
+
+struct TransactionInfo;
+
+DEFINE_ROLE(TransactionListener)
+{   
+    DEFAULT(Status, onStarting(const TransactionInfo&, ActionId));
+    DEFAULT(Status, onDone(const TransactionInfo&, ActionId, Status));
+};
+
+#endif
+\end{c++}
+\end{leftbar}
+
+\begin{regulation}
+当返回的是一个新对象时，必须返回其值类型; 更有甚者，返回\ascii{const}的值类型将改善编译时的安全性。
+\end{regulation}
+
+反例：
+\begin{leftbar}
+\begin{c++}[caption={math/Rectangle.h}]
+#ifndef EWRIUN9037_NVHD6452_JKLSDFUIE7562_HGYE
+#define EWRIUN9037_NVHD6452_JKLSDFUIE7562_HGYE
+
+#include <cub/base/BaseTypes.h>
+
+struct Rectangle
+{
+    Rectangle(const U8 width, const U8 height);
+
+    U16 getArea() const;
+    U16 getPerimeter() const;
+    
+    bool operator==(const Rectangle& rhs) const;
+    bool operator!=(const Rectangle& rhs) const;
+    
+    Rectangle& operator+=(const Rectangle& rhs) const;
+    Rectangle& operator+(const Rectangle& rhs) const;
+
+private:
+    const U8 width;
+    const U8 height;
+};
+
+#endif
+\end{c++}
+\end{leftbar}
+
+按照惯例，\ascii{operator+}返回的是一个新实例，返回值应该设计为值类型。如果提供\ascii{const}的修饰能够加强编译时的安全性检查。此外，需要注意的是\ascii{operator+=}返回的是修改后的\texttt{*this}对象引用。
+
+正例：
+\begin{leftbar}
+\begin{c++}[caption={math/Rectangle.h}]
+#ifndef EWRIUN9037_NVHD6452_JKLSDFUIE7562_HGYE
+#define EWRIUN9037_NVHD6452_JKLSDFUIE7562_HGYE
+
+#include <cub/base/BaseTypes.h>
+
+struct Rectangle
+{
+    Rectangle(const U8 width, const U8 height);
+
+    U16 getArea() const;
+    U16 getPerimeter() const;
+    
+    bool operator==(const Rectangle& rhs) const;
+    bool operator!=(const Rectangle& rhs) const;
+    
+    Rectangle& operator+=(const Rectangle& rhs) const;
+    Rectangle operator+(const Rectangle& rhs) const;
+
+private:
+    const U8 width;
+    const U8 height;
+};
+
+#endif
+\end{c++}
+\end{leftbar}
+
+\begin{regulation}
+不能返回局部对象的引用或指针。
+\end{regulation}
+
+返回值类型还是引用类型常常会困扰部分\cpp{}程序员。其实规则非常简单，返回值对象当且仅当需要创建新对象的时候，此时如果企图返回引用或指针，将导致运行时异常。
+
+\end{content}
+
+\section{不可变类}
+
+\begin{content}
+
+\begin{advise}
+鼓励设计不可变类\ascii{(Immutable Class)}表达值对象\ascii{(Value Object)}的语义
+\end{advise}
+
+不可变类的每一个实例在创建的时候就包含了所有必要的信息，其对象在整个生命周期中都不会发生变化。不可变类具有如下几方面的优势：
+\begin{enum}
+  \eitem{相对于可变对象的复杂的状态空间，不可变类仅有一个状态，容易设计、实现和控制}
+  \eitem{不可变类本质上是线程安全的，它们不需要同步}
+  \eitem{不可变类可被自由地共享，重用对象是一种良好设计的习惯}
+\end{enum}
+
+设计不可变类，需遵循如下规则：
+\begin{enum}
+  \eitem{不能提供修改对象状态的方法}
+  \eitem{保证类不能被扩展，切忌提供\ascii{virtual destructor}}
+  \eitem{所有成员变量和方法都是\ascii{const}}
+  \eitem{所有成员变量都是\ascii{private}}
+  \eitem{绝不允许重新赋值，但允许克隆出新的实例}
+\end{enum}
+
+不可变类唯一的缺点就是，对于每一个不同的值都需要一个单独的对象。当需要创建大量此类对象时，性能可能成为瓶颈。当性能成为关键瓶颈的时候，为不可变类设计可变配套类是一种典型的设计方式。
+
+上例讲解的\ascii{Rectangle}类也是一种典型的不可变类的设计；而\ascii{std::string}为了追求性能，设计为一个可变类。
+
+\begin{regulation}
+尽量使类的可变性最小化
+\end{regulation}
+
+坚决抵制为每一个\ascii{get}函数都写一个\ascii{set}函数，除非存在一个很好的理由。构造函数的职责就是来完成对象的初始化，并建立起所有的约束关系。除非有很好的理由，不要在构造函数之外提供其他公开的初始化方法。
+
+\end{content}
+
